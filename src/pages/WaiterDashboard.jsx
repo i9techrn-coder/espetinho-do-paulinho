@@ -30,7 +30,7 @@ export default function WaiterDashboard() {
 
   const isGestor = currentUser?.role === 'Gestor';
 
-  const visibleTables = isGestor || currentUser?.assignedTables === 'todas' 
+  const visibleTables = isGestor || !currentUser?.assignedTables || currentUser?.assignedTables === 'todas' 
     ? tables 
     : tables.filter(t => currentUser?.assignedTables.split(',').includes(t.id.toString()));
 
