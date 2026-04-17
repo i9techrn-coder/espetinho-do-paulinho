@@ -1,14 +1,17 @@
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   ShoppingBag, Users, Plus, X, Search, ChevronRight, 
   Banknote, Smartphone, CreditCard, Receipt, CheckCircle2, Minus, LogOut 
 } from 'lucide-react';
+import { useStore } from '../context/StoreContext';
 
 export default function WaiterDashboard() {
   const { orders, addOrder, closeOrder, pixConfig, products, categories, tables, team, currentUser, logout } = useStore();
   const [selectedTable, setSelectedTable] = useState(null);
   const [checkoutOrder, setCheckoutOrder] = useState(null);
   const [activeTab, setActiveTab] = useState('mesas');
+  const [loggedWaiter, setLoggedWaiter] = useState(currentUser);
   const navigate = useNavigate();
 
   const handleLogout = () => {
