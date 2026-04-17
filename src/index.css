@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+@theme {
+  /* Common Keyframes */
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+}
+
+@layer base {
+  /* Default Styles */
+  body {
+    @apply font-sans transition-colors duration-500;
+  }
+}
+
+/* --- THEME A: MODERN DARK --- */
+.theme-a {
+  --color-bg: #0f172a;
+  --color-card: #1e293b;
+  --color-primary: #ef4444; /* Red */
+  --color-secondary: #f59e0b; /* Yellow */
+  --color-text: #ffffff;
+  --color-text-muted: #94a3b8;
+}
+
+.theme-a body {
+  @apply bg-[#0f172a] text-white;
+}
+
+.theme-a .card {
+  @apply bg-slate-800/80 border border-white/10 rounded-2xl backdrop-blur-md shadow-xl;
+}
+
+.theme-a .btn-main {
+  @apply bg-red-500 hover:bg-red-600 text-white font-bold py-4 px-6 rounded-xl shadow-lg shadow-red-500/20 active:scale-95 transition-all;
+}
+
+/* --- THEME B: CLEAN LIGHT --- */
+.theme-b {
+  --color-bg: #f8fafc;
+  --color-card: #ffffff;
+  --color-primary: #f97316; /* Orange */
+  --color-secondary: #0f172a; /* Navy */
+  --color-text: #0f172a;
+  --color-text-muted: #64748b;
+}
+
+.theme-b body {
+  @apply bg-slate-50 text-slate-900;
+}
+
+.theme-b .card {
+  @apply bg-white border border-slate-200 rounded-lg shadow-sm;
+}
+
+.theme-b .btn-main {
+  @apply bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-6 rounded-lg active:scale-95 transition-all;
+}
+
+/* --- THEME C: RUSTIC BISTRO --- */
+.theme-c {
+  --color-bg: #2d2a2e;
+  --color-card: #403e41;
+  --color-primary: #ffd866; /* Amber */
+  --color-secondary: #78dce8; /* Cyan */
+  --color-text: #fcfcfc;
+  --color-text-muted: #939293;
+}
+
+.theme-c body {
+  @apply bg-[#2d2a2e] text-[#fcfcfc];
+}
+
+.theme-c .card {
+  @apply bg-[#403e41] border-2 border-white/5 rounded-[2rem] shadow-2xl;
+}
+
+.theme-c .btn-main {
+  @apply bg-[#ffd866] hover:bg-[#ffcd33] text-slate-900 font-black py-4 px-8 rounded-full border-b-4 border-yellow-700 active:border-b-0 active:translate-y-1 transition-all;
+}
+
+/* Utility Classes */
+.animate-fade-in { animation: fadeIn 0.4s ease-out; }
+.animate-slide-up { animation: slideUp 0.3s ease-out; }
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
