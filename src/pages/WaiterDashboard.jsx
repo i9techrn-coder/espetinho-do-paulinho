@@ -224,16 +224,16 @@ function OrderModal({ table, currentOrder, products, categories, onClose, onChec
   return (
     <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-6 bg-black/80 backdrop-blur-md animate-fade-in">
       <div className="bg-white w-full max-w-6xl h-[94vh] md:h-[90vh] rounded-t-[4rem] md:rounded-[4rem] flex flex-col overflow-hidden shadow-2xl">
-        <div className="p-8 md:p-10 border-b border-slate-100 flex justify-between items-center bg-white relative z-10">
+        <div className="p-6 md:p-10 border-b border-slate-100 flex justify-between items-center bg-white relative z-10">
           <div>
             <div className="flex items-center gap-3">
-              <span className="w-12 h-12 bg-red-600 rounded-2xl flex items-center justify-center text-white font-black text-lg shadow-lg">#{table.id}</span>
-              <h2 className="text-4xl font-black text-slate-800 tracking-tighter italic uppercase">Gerenciar Mesa</h2>
+              <span className="w-10 h-10 md:w-12 md:h-12 bg-red-600 rounded-xl md:rounded-2xl flex items-center justify-center text-white font-black text-sm md:text-lg shadow-lg">#{table.id}</span>
+              <h2 className="text-2xl md:text-4xl font-black text-slate-800 tracking-tighter italic uppercase">Gerenciar Mesa</h2>
             </div>
-            <p className="text-[10px] font-black opacity-30 uppercase tracking-widest mt-2 px-1">Lançamento rápido de pedidos</p>
+            <p className="text-[9px] md:text-[10px] font-black opacity-30 uppercase tracking-widest mt-1 md:mt-2 px-1">Lançamento rápido de pedidos</p>
           </div>
-          <button onClick={onClose} className="w-16 h-16 rounded-3xl bg-slate-50 flex items-center justify-center text-slate-300 hover:bg-red-500 hover:text-white transition-all duration-300">
-            <X size={32} />
+          <button onClick={onClose} className="w-12 h-12 md:w-16 md:h-16 rounded-2xl md:rounded-3xl bg-slate-50 flex items-center justify-center text-slate-300 hover:bg-red-500 hover:text-white transition-all duration-300 shrink-0 ml-2">
+            <X size={24} className="md:w-8 md:h-8" />
           </button>
         </div>
 
@@ -258,16 +258,16 @@ function OrderModal({ table, currentOrder, products, categories, onClose, onChec
                 <button 
                   key={p.id} 
                   onClick={() => addToCart(p)}
-                  className="bg-slate-50 border-2 border-transparent p-6 rounded-[2.5rem] text-left hover:border-red-500 hover:bg-white active:scale-95 transition-all group flex flex-col justify-between h-40 shadow-sm"
+                  className="bg-slate-50 border-2 border-transparent p-4 md:p-6 rounded-3xl md:rounded-[2.5rem] text-left hover:border-red-500 hover:bg-white active:scale-95 transition-all group flex flex-col justify-between h-[120px] md:h-40 shadow-sm"
                 >
                   <div>
-                    <h4 className="font-black text-sm text-slate-800 leading-tight uppercase italic group-hover:text-red-600 transition-colors">{p.name}</h4>
-                    <p className="text-[8px] font-black opacity-20 uppercase tracking-widest mt-1">Disponível</p>
+                    <h4 className="font-black text-xs md:text-sm text-slate-800 leading-tight uppercase italic group-hover:text-red-600 transition-colors">{p.name}</h4>
+                    <p className="text-[7px] md:text-[8px] font-black opacity-20 uppercase tracking-widest mt-0.5 md:mt-1">Disponível</p>
                   </div>
-                  <div className="flex justify-between items-end">
-                    <p className="text-2xl font-black text-slate-400 group-hover:text-red-600 transition-colors font-sans">R$ {p.price.toFixed(2)}</p>
-                    <div className="bg-white w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg group-hover:bg-red-600 group-hover:text-white transition-all">
-                      <Plus size={20} />
+                  <div className="flex justify-between items-end mt-2 md:mt-0">
+                    <p className="text-lg md:text-2xl font-black text-slate-400 group-hover:text-red-600 transition-colors font-sans leading-none">R$ {p.price.toFixed(2)}</p>
+                    <div className="bg-white w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl flex items-center justify-center shadow-md md:shadow-lg group-hover:bg-red-600 group-hover:text-white transition-all shrink-0">
+                      <Plus size={18} className="md:w-5 md:h-5" />
                     </div>
                   </div>
                 </button>
@@ -275,10 +275,11 @@ function OrderModal({ table, currentOrder, products, categories, onClose, onChec
             </div>
           </div>
 
-          <div className="w-full md:w-[400px] bg-slate-50 border-t md:border-t-0 md:border-l border-slate-100 p-4 shrink-0 h-[45vh] md:h-auto md:p-10 flex flex-col shadow-inner">
-            <div className="flex items-center gap-3 mb-4 md:mb-8 opacity-20">
-              <ShoppingBag size={16} />
-              <h3 className="text-[10px] font-black uppercase tracking-widest">Itens na Mesa</h3>
+          <div className="w-full md:w-[400px] bg-slate-50 border-t-4 border-t-red-600 md:border-t-0 md:border-l border-slate-100 p-4 shrink-0 h-[45vh] md:h-auto md:p-10 flex flex-col shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] md:shadow-inner relative">
+            <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-4 md:hidden" />
+            <div className="flex items-center gap-2 mb-4 md:mb-8 border-b-2 border-slate-200/50 pb-2 md:border-none md:pb-0 md:opacity-20 text-slate-800">
+              <ShoppingBag size={16} className="text-red-600 md:text-current" />
+              <h3 className="text-[10px] md:text-xs font-black uppercase tracking-widest leading-none mt-0.5">Itens na Mesa</h3>
             </div>
             
             <div className="flex-1 overflow-y-auto space-y-3 md:space-y-4 pr-1 no-scrollbar min-h-0 md:min-h-[200px]">
