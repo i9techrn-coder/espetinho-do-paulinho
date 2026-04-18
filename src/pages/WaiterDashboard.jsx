@@ -224,16 +224,16 @@ function OrderModal({ table, currentOrder, products, categories, onClose, onChec
   return (
     <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-6 bg-black/80 backdrop-blur-md animate-fade-in">
       <div className="bg-white w-full max-w-6xl h-[94vh] md:h-[90vh] rounded-t-[4rem] md:rounded-[4rem] flex flex-col overflow-hidden shadow-2xl">
-        <div className="p-6 md:p-10 border-b border-slate-100 flex justify-between items-center bg-white relative z-10">
+        <div className="p-4 md:p-10 border-b border-slate-100 flex justify-between items-center bg-white relative z-10">
           <div>
-            <div className="flex items-center gap-3">
-              <span className="w-10 h-10 md:w-12 md:h-12 bg-red-600 rounded-xl md:rounded-2xl flex items-center justify-center text-white font-black text-sm md:text-lg shadow-lg">#{table.id}</span>
-              <h2 className="text-2xl md:text-4xl font-black text-slate-800 tracking-tighter italic uppercase">Gerenciar Mesa</h2>
+            <div className="flex items-center gap-2 md:gap-3">
+              <span className="w-8 h-8 md:w-12 md:h-12 bg-red-600 rounded-lg md:rounded-2xl flex items-center justify-center text-white font-black text-xs md:text-lg shadow-lg">#{table.id}</span>
+              <h2 className="text-xl sm:text-2xl md:text-4xl font-black text-slate-800 tracking-tighter italic uppercase leading-none">Gerenciar Mesa</h2>
             </div>
-            <p className="text-[9px] md:text-[10px] font-black opacity-30 uppercase tracking-widest mt-1 md:mt-2 px-1">Lançamento rápido de pedidos</p>
+            <p className="text-[8px] md:text-[10px] font-black opacity-30 uppercase tracking-widest mt-1 md:mt-2 px-1 leading-none">Lançamento rápido de pedidos</p>
           </div>
-          <button onClick={onClose} className="w-12 h-12 md:w-16 md:h-16 rounded-2xl md:rounded-3xl bg-slate-50 flex items-center justify-center text-slate-300 hover:bg-red-500 hover:text-white transition-all duration-300 shrink-0 ml-2">
-            <X size={24} className="md:w-8 md:h-8" />
+          <button onClick={onClose} className="w-10 h-10 md:w-16 md:h-16 rounded-xl md:rounded-3xl bg-slate-50 flex items-center justify-center text-slate-300 hover:bg-red-500 hover:text-white transition-all duration-300 shrink-0 ml-2">
+            <X size={20} className="md:w-8 md:h-8" />
           </button>
         </div>
 
@@ -258,16 +258,16 @@ function OrderModal({ table, currentOrder, products, categories, onClose, onChec
                 <button 
                   key={p.id} 
                   onClick={() => addToCart(p)}
-                  className="bg-slate-50 border-2 border-transparent p-4 md:p-6 rounded-3xl md:rounded-[2.5rem] text-left hover:border-red-500 hover:bg-white active:scale-95 transition-all group flex flex-col justify-between h-[120px] md:h-40 shadow-sm"
+                  className="bg-slate-50 border-2 border-transparent p-3 md:p-6 rounded-2xl md:rounded-[2.5rem] text-left hover:border-red-500 hover:bg-white active:scale-95 transition-all group flex flex-col justify-between h-auto gap-1 md:gap-0 md:h-40 shadow-sm"
                 >
                   <div>
                     <h4 className="font-black text-xs md:text-sm text-slate-800 leading-tight uppercase italic group-hover:text-red-600 transition-colors">{p.name}</h4>
                     <p className="text-[7px] md:text-[8px] font-black opacity-20 uppercase tracking-widest mt-0.5 md:mt-1">Disponível</p>
                   </div>
-                  <div className="flex justify-between items-end mt-2 md:mt-0">
+                  <div className="flex justify-between items-end mt-1 md:mt-0">
                     <p className="text-lg md:text-2xl font-black text-slate-400 group-hover:text-red-600 transition-colors font-sans leading-none">R$ {p.price.toFixed(2)}</p>
-                    <div className="bg-white w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl flex items-center justify-center shadow-md md:shadow-lg group-hover:bg-red-600 group-hover:text-white transition-all shrink-0">
-                      <Plus size={18} className="md:w-5 md:h-5" />
+                    <div className="bg-white w-7 h-7 md:w-10 md:h-10 rounded-lg md:rounded-2xl flex items-center justify-center shadow-sm md:shadow-lg group-hover:bg-red-600 group-hover:text-white transition-all shrink-0">
+                      <Plus size={16} className="md:w-5 md:h-5" />
                     </div>
                   </div>
                 </button>
@@ -290,15 +290,15 @@ function OrderModal({ table, currentOrder, products, categories, onClose, onChec
                 </div>
               ) : (
                 cart.map(item => (
-                  <div key={item.id} className="flex justify-between items-center bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200/50 transition-all hover:shadow-md animate-slide-up">
+                  <div key={item.id} className="flex justify-between items-center bg-white p-4 md:p-6 rounded-2xl md:rounded-[2rem] shadow-sm border border-slate-200/50 transition-all hover:shadow-md animate-slide-up">
                     <div className="flex-1">
                       <p className="font-black text-xs text-slate-800 uppercase italic">{item.name}</p>
                       <p className="text-[10px] font-black opacity-30 uppercase tracking-tighter mt-0.5 font-sans">R$ {item.price.toFixed(2)} / un</p>
                     </div>
-                    <div className="flex items-center gap-4 bg-slate-50 p-2 rounded-2xl border border-slate-100">
-                      <button onClick={() => setCart(c => c.map(x => x.id === item.id ? {...x, qty: Math.max(0, x.qty - 1)} : x).filter(x => x.qty > 0))} className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-400 hover:text-red-600 shadow-sm transition-colors"><Minus size={18} /></button>
-                      <span className="font-black text-lg w-6 text-center tracking-tighter font-sans">{item.qty}</span>
-                      <button onClick={() => setCart(c => c.map(x => x.id === item.id ? {...x, qty: x.qty + 1} : x))} className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-400 hover:text-red-600 shadow-sm transition-colors"><Plus size={18} /></button>
+                    <div className="flex items-center gap-2 md:gap-4 bg-slate-50 p-1.5 md:p-2 rounded-xl md:rounded-2xl border border-slate-100">
+                      <button onClick={() => setCart(c => c.map(x => x.id === item.id ? {...x, qty: Math.max(0, x.qty - 1)} : x).filter(x => x.qty > 0))} className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-white flex items-center justify-center text-slate-400 hover:text-red-600 shadow-sm transition-colors"><Minus size={16} className="md:w-[18px]" /></button>
+                      <span className="font-black text-base md:text-lg w-5 md:w-6 text-center tracking-tighter font-sans">{item.qty}</span>
+                      <button onClick={() => setCart(c => c.map(x => x.id === item.id ? {...x, qty: x.qty + 1} : x))} className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-white flex items-center justify-center text-slate-400 hover:text-red-600 shadow-sm transition-colors"><Plus size={16} className="md:w-[18px]" /></button>
                     </div>
                   </div>
                 ))
