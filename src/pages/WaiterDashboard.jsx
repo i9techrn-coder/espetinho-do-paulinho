@@ -42,20 +42,20 @@ export default function WaiterDashboard() {
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-20">
       <header className="bg-white border-b border-slate-200 p-6 sticky top-0 z-30 shadow-sm">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-start">
             <div>
-              <h1 className="text-2xl font-black text-slate-800 tracking-tighter uppercase italic">Paulinho • Garçom</h1>
+              <h1 className="text-2xl font-black text-slate-800 tracking-tighter uppercase italic">{currentUser?.name} • {currentUser?.role === 'Gestor' ? 'Gestor' : 'Garçom'}</h1>
               <p className="text-[10px] font-black opacity-30 uppercase tracking-widest">Painel de Operação</p>
             </div>
-            <select 
-              value={loggedWaiter?.id} 
-              onChange={(e) => setLoggedWaiter(team.find(t => t.id === parseInt(e.target.value)))}
-              className="bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-2 font-black text-[10px] uppercase tracking-widest outline-none focus:border-red-600 cursor-pointer"
+            <button 
+              onClick={handleLogout}
+              className="md:hidden p-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors"
             >
-              {team.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
-            </select>
+              <LogOut size={20} />
+            </button>
           </div>
-          <div className="flex bg-slate-100 rounded-2xl p-1.5 shadow-inner">
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <div className="flex bg-slate-100 rounded-2xl p-1.5 shadow-inner flex-1 md:flex-none">
             <button 
               onClick={() => setActiveTab('mesas')}
               className={`px-8 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${activeTab === 'mesas' ? 'bg-white shadow-md text-red-600' : 'opacity-40 hover:opacity-100'}`}
@@ -69,8 +69,15 @@ export default function WaiterDashboard() {
               Lista
             </button>
           </div>
+          <button 
+            onClick={handleLogout}
+            className="hidden md:flex p-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors ml-2"
+          >
+            <LogOut size={20} />
+          </button>
         </div>
-      </header>
+      </div>
+    </header>
 
       <main className="p-6 max-w-7xl mx-auto">
         {activeTab === 'mesas' ? (
@@ -230,8 +237,8 @@ function OrderModal({ table, currentOrder, products, categories, onClose, onChec
           </button>
         </div>
 
-        <div className="flex-1 overflow-hidden flex flex-col md:flex-row">
-          <div className="flex-1 overflow-y-auto p-6 md:p-10 no-scrollbar bg-white">
+        <div className="flex-1 overflow-hidden flex flex-col md:flex-row min-h-0">
+          <div className="flex-1 overflow-y-auto p-6 md:p-10 no-scrollbar bg-white min-h-0">
             <div className="flex gap-3 overflow-x-auto pb-8 no-scrollbar">
               {categories.map(c => (
                 <button 
