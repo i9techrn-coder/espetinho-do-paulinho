@@ -275,16 +275,16 @@ function OrderModal({ table, currentOrder, products, categories, onClose, onChec
             </div>
           </div>
 
-          <div className="w-full md:w-[400px] bg-slate-50 border-t md:border-t-0 md:border-l border-slate-100 p-8 md:p-10 flex flex-col shadow-inner">
-            <div className="flex items-center gap-3 mb-8 opacity-20">
+          <div className="w-full md:w-[400px] bg-slate-50 border-t md:border-t-0 md:border-l border-slate-100 p-4 shrink-0 h-[45vh] md:h-auto md:p-10 flex flex-col shadow-inner">
+            <div className="flex items-center gap-3 mb-4 md:mb-8 opacity-20">
               <ShoppingBag size={16} />
               <h3 className="text-[10px] font-black uppercase tracking-widest">Itens na Mesa</h3>
             </div>
             
-            <div className="flex-1 overflow-y-auto space-y-4 pr-1 no-scrollbar min-h-[200px]">
+            <div className="flex-1 overflow-y-auto space-y-3 md:space-y-4 pr-1 no-scrollbar min-h-0 md:min-h-[200px]">
               {cart.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center opacity-10 text-center gap-4">
-                  <Plus size={48} />
+                <div className="h-full flex flex-col items-center justify-center opacity-10 text-center gap-2 md:gap-4">
+                  <Plus size={32} className="md:w-12 md:h-12" />
                   <p className="font-black text-xs uppercase tracking-widest">Mesa vazia</p>
                 </div>
               ) : (
@@ -304,25 +304,25 @@ function OrderModal({ table, currentOrder, products, categories, onClose, onChec
               )}
             </div>
             
-            <div className="mt-8 pt-10 border-t border-slate-200">
-              <div className="flex justify-between items-end mb-10 px-2">
+            <div className="mt-4 md:mt-8 pt-4 md:pt-10 border-t border-slate-200">
+              <div className="flex justify-between items-end mb-4 md:mb-10 px-2">
                 <span className="font-black opacity-20 uppercase text-xs tracking-widest italic">Total Parcial</span>
                 <div className="text-right">
-                  <span className="text-5xl font-black text-slate-900 tracking-tighter italic block font-sans">R$ {total.toFixed(2)}</span>
+                  <span className="text-3xl md:text-5xl font-black text-slate-900 tracking-tighter italic block font-sans">R$ {total.toFixed(2)}</span>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3 md:gap-4">
                 <button 
                   onClick={handleSave} 
                   disabled={cart.length === 0}
-                  className="bg-slate-900 disabled:opacity-30 text-white font-black py-7 rounded-[2.5rem] text-xs uppercase tracking-widest active:scale-95 transition-all shadow-xl"
+                  className="bg-slate-900 disabled:opacity-30 text-white font-black py-4 md:py-7 rounded-3xl md:rounded-[2.5rem] text-[10px] md:text-xs uppercase tracking-widest active:scale-95 transition-all shadow-xl"
                 >
                   Salvar
                 </button>
                 <button 
                   onClick={() => onCheckout({ ...currentOrder, items: cart, total, tableId: table.id, id: currentOrder?.id || Date.now() })} 
                   disabled={cart.length === 0}
-                  className="bg-red-600 disabled:opacity-30 text-white font-black py-7 rounded-[2.5rem] text-xs uppercase tracking-widest active:scale-95 transition-all shadow-2xl shadow-red-600/30"
+                  className="bg-red-600 disabled:opacity-30 text-white font-black py-4 md:py-7 rounded-3xl md:rounded-[2.5rem] text-[10px] md:text-xs uppercase tracking-widest active:scale-95 transition-all shadow-2xl shadow-red-600/30"
                 >
                   Pagar
                 </button>
