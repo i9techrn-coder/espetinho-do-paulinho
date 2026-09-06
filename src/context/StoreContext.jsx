@@ -26,16 +26,21 @@ export const StoreProvider = ({ children, tenant }) => {
   const [tables, setTables] = useState(() => getSaved('tables', Array.from({ length: 20 }, (_, i) => ({ id: i + 1, name: `Mesa ${i+1}` }))));
   const [orders, setOrders] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
-  
-  // O PIX agora vem do Tenant no Supabase
+
+  // Configurações do Tenant do Jana
   const [pixConfig, setPixConfig] = useState({ key: tenant.pix_key || '', qrCode: '' });
-  
-  const [team, setTeam] = useState(() => getSaved('team', [
-    { id: 1, name: 'Admin ' + tenant.name, login: 'admin', password: '123', role: 'Gestor', active: true, assignedTables: 'todas' },
-    { id: 2, name: 'Garçom', login: 'garcom', password: '123', role: 'Garçom', active: true, assignedTables: 'todas' },
-  ]));
-  
-  const [schedule, setSchedule] = useState(() => getSaved('schedule', {
+  const [contactConfig, setContactConfig] = useState({
+    phone: tenant.phone || tenant.whatsapp || '',
+    instagram: tenant.instagram || '',
+    locationUrl: tenant.address || '',
+    address: tenant.address || ''
+  });
+  const [orderMethods, setOrderMethods] = useState(tenant.order_methods || { pickup: true, delivery: true });
+  const [deliveryFees, setDeliveryFees] = useState(tenant.delivery_fees || [
+    { name: 'Centro', fee: 5.00 },
+    { name: 'Bairro Vizinho', fee: 7.00 }
+  ]);
+  const [schedule, setSchedule] = useState(tenant.schedule || {
     'Segunda': { open: '18:00', close: '00:00', active: true },
     'Terça': { open: '18:00', close: '00:00', active: true },
     'Quarta': { open: '18:00', close: '00:00', active: true },
@@ -43,37 +48,124 @@ export const StoreProvider = ({ children, tenant }) => {
     'Sexta': { open: '18:00', close: '02:00', active: true },
     'Sábado': { open: '18:00', close: '02:00', active: true },
     'Domingo': { open: '18:00', close: '23:00', active: true },
-  }));
+  });
+
+  const [team, setTeam] = useState(() => getSaved('team', [
+    { id: 1, name: 'Admin ' + tenant.name, login: 'admin', password: '123', role: 'Gestor', active: true, assignedTables: 'todas' },
+    { id: 2, name: 'Garçom', login: 'garcom', password: '123', role: 'Garçom', active: true, assignedTables: 'todas' },
+  ]));
+
+  // Toast state
+  const [toast, setToast] = useState(null);
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   // Buscar dados do Supabase ao carregar
   useEffect(() => {
     async function fetchData() {
       setLoadingData(true);
+      
       // Busca categorias
       const { data: catData } = await supabase.from('categories').select('*').eq('tenant_id', tenant.id);
-      if (catData) setCategories(catData.map(c => c.name));
+      if (catData && catData.length > 0) {
+        setCategories(catData.map(c => c.name));
+      }
 
       // Busca produtos
       const { data: prodData } = await supabase.from('products').select('*').eq('tenant_id', tenant.id);
-      if (prodData) setProducts(prodData);
+      if (prodData) {
+        setProducts(prodData);
+      }
 
-      // Busca pedidos (apenas os do dia atual em um app real, mas aqui pegamos os não finalizados)
+      // Busca pedidos
       const { data: orderData } = await supabase.from('orders').select('*').eq('tenant_id', tenant.id);
-      if (orderData) setOrders(orderData);
+      if (orderData) {
+        setOrders(orderData.map(o => ({
+          ...o,
+          tableId: o.customer_data?.tableId || o.origin,
+          customerData: o.customer_data
+        })));
+      }
       
       setLoadingData(false);
     }
     
     fetchData();
-
-    // Configurar WebSockets (Realtime) para os pedidos no futuro!
   }, [tenant.id]);
+
+  // Persistir alterações de Tenant no Supabase
+  const updatePixConfig = async (newConfig) => {
+    setPixConfig(newConfig);
+    await supabase.from('tenants').update({ pix_key: newConfig.key }).eq('id', tenant.id);
+    showToast('Chave PIX atualizada!');
+  };
+
+  const updateContactConfig = async (newConfig) => {
+    setContactConfig(newConfig);
+    await supabase.from('tenants').update({ 
+      contact_config: newConfig,
+      address: newConfig.address || newConfig.locationUrl,
+      instagram: newConfig.instagram,
+      phone: newConfig.phone
+    }).eq('id', tenant.id);
+    showToast('Contatos atualizados!');
+  };
+
+  const updateDeliveryFees = async (newFees) => {
+    setDeliveryFees(newFees);
+    await supabase.from('tenants').update({ delivery_fees: newFees }).eq('id', tenant.id);
+    showToast('Taxas de entrega salvas!');
+  };
+
+  const updateOrderMethods = async (newMethods) => {
+    setOrderMethods(newMethods);
+    await supabase.from('tenants').update({ order_methods: newMethods }).eq('id', tenant.id);
+    showToast('Métodos de pedido salvos!');
+  };
+
+  const updateSchedule = async (newSchedule) => {
+    setSchedule(newSchedule);
+    await supabase.from('tenants').update({ schedule: newSchedule }).eq('id', tenant.id);
+    showToast('Horários salvos!');
+  };
+
+  const updateCategories = async (newCats) => {
+    setCategories(newCats);
+  };
+
+  const updateProducts = async (newProds) => {
+    setProducts(newProds);
+  };
+
+  const addProduct = async (prod) => {
+    const { data } = await supabase.from('products').insert([{ ...prod, tenant_id: tenant.id }]).select().single();
+    if (data) {
+      setProducts(prev => [...prev, data]);
+      showToast('Produto adicionado!');
+    }
+  };
+
+  const editProduct = async (prod) => {
+    const { data } = await supabase.from('products').update(prod).eq('id', prod.id).select().single();
+    if (data) {
+      setProducts(prev => prev.map(p => p.id === prod.id ? data : p));
+      showToast('Produto atualizado!');
+    }
+  };
+
+  const deleteProduct = async (id) => {
+    await supabase.from('products').delete().eq('id', id);
+    setProducts(prev => prev.filter(p => p.id !== id));
+    showToast('Produto removido!');
+  };
 
   // Auto-save do que ainda é local
   useEffect(() => {
-    const dataToSave = { currentUser, isStoreOpenManual, team, schedule, tables };
+    const dataToSave = { currentUser, isStoreOpenManual, team, tables };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
-  }, [currentUser, isStoreOpenManual, team, schedule, tables]);
+  }, [currentUser, isStoreOpenManual, team, tables]);
 
   const login = (loginStr, password) => {
     const user = team.find(u => u.login === loginStr && u.password === password && u.active);
@@ -120,7 +212,6 @@ export const StoreProvider = ({ children, tenant }) => {
     };
 
     if (existingIdx !== -1) {
-      // Atualizar pedido existente no Supabase (merge de itens)
       const existingOrder = orders[existingIdx];
       const mergedItems = [...existingOrder.items, ...orderData.items];
       const newTotal = existingOrder.total + orderData.total;
@@ -130,17 +221,19 @@ export const StoreProvider = ({ children, tenant }) => {
         total: newTotal
       }).eq('id', existingOrder.id);
       
-      // Atualiza estado local
       setOrders(prev => {
         const updated = [...prev];
         updated[existingIdx] = { ...existingOrder, items: mergedItems, total: newTotal };
         return updated;
       });
     } else {
-      // Criar novo pedido no Supabase
       const { data } = await supabase.from('orders').insert([newOrderInfo]).select().single();
       if (data) {
-        setOrders(prev => [...prev, data]);
+        setOrders(prev => [...prev, {
+          ...data,
+          tableId: data.customer_data?.tableId || data.origin,
+          customerData: data.customer_data
+        }]);
       }
     }
   };
@@ -150,19 +243,34 @@ export const StoreProvider = ({ children, tenant }) => {
     setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'finalizado' } : o));
   };
 
+  const updateOrderStatus = async (orderId, newStatus) => {
+    await supabase.from('orders').update({ status: newStatus }).eq('id', orderId);
+    setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+  };
+
+  const resetOrders = async () => {
+    await supabase.from('orders').delete().eq('tenant_id', tenant.id);
+    setOrders([]);
+    showToast('Vendas zeradas com sucesso!');
+  };
+
   return (
     <StoreContext.Provider value={{ 
       tenant,
       isStoreOpen, isStoreOpenManual, toggleStore, 
-      orders, setOrders, addOrder, closeOrder,
+      orders, setOrders, addOrder, closeOrder, updateOrderStatus, resetOrders,
       team, setTeam,
       currentUser, login, logout,
-      pixConfig, setPixConfig,
-      categories, setCategories,
-      products, setProducts,
-      schedule, setSchedule,
+      pixConfig, setPixConfig, updatePixConfig,
+      contactConfig, setContactConfig, updateContactConfig,
+      orderMethods, setOrderMethods, updateOrderMethods,
+      deliveryFees, setDeliveryFees, updateDeliveryFees,
+      categories, setCategories: updateCategories,
+      products, setProducts: updateProducts, addProduct, editProduct, deleteProduct,
+      schedule, setSchedule: updateSchedule,
       tables, setTables,
-      loadingData
+      loadingData,
+      toast, showToast
     }}>
       {children}
     </StoreContext.Provider>
