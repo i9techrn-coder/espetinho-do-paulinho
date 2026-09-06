@@ -25,6 +25,7 @@ export const StoreProvider = ({ children, tenant }) => {
   const [categories, setCategories] = useState([]);
   const [tables, setTables] = useState(() => getSaved('tables', Array.from({ length: 20 }, (_, i) => ({ id: i + 1, name: `Mesa ${i+1}` }))));
   const [orders, setOrders] = useState([]);
+  const [loadingData, setLoadingData] = useState(true);
   
   // O PIX agora vem do Tenant no Supabase
   const [pixConfig, setPixConfig] = useState({ key: tenant.pix_key || '', qrCode: '' });
@@ -47,6 +48,7 @@ export const StoreProvider = ({ children, tenant }) => {
   // Buscar dados do Supabase ao carregar
   useEffect(() => {
     async function fetchData() {
+      setLoadingData(true);
       // Busca categorias
       const { data: catData } = await supabase.from('categories').select('*').eq('tenant_id', tenant.id);
       if (catData) setCategories(catData.map(c => c.name));
@@ -58,6 +60,8 @@ export const StoreProvider = ({ children, tenant }) => {
       // Busca pedidos (apenas os do dia atual em um app real, mas aqui pegamos os não finalizados)
       const { data: orderData } = await supabase.from('orders').select('*').eq('tenant_id', tenant.id);
       if (orderData) setOrders(orderData);
+      
+      setLoadingData(false);
     }
     
     fetchData();
@@ -157,7 +161,8 @@ export const StoreProvider = ({ children, tenant }) => {
       categories, setCategories,
       products, setProducts,
       schedule, setSchedule,
-      tables, setTables
+      tables, setTables,
+      loadingData
     }}>
       {children}
     </StoreContext.Provider>
