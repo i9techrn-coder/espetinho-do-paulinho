@@ -7,41 +7,41 @@ const DEFAULT_CATEGORIES = ["CHURRASCO", "BEBIDAS ALCOÓLICAS", "BEBIDAS NÃO AL
 
 const DEFAULT_PRODUCTS = [
   // CHURRASCO
-  { name: "Asa de frango", price: 5.00, category: "CHURRASCO", active: true },
-  { name: "Calabresa", price: 5.00, category: "CHURRASCO", active: true },
-  { name: "Camarão", price: 5.00, category: "CHURRASCO", active: true },
-  { name: "Carne", price: 5.00, category: "CHURRASCO", active: true },
-  { name: "Charque", price: 5.00, category: "CHURRASCO", active: true },
-  { name: "Coração de boi", price: 5.00, category: "CHURRASCO", active: true },
-  { name: "Coração de frango", price: 5.00, category: "CHURRASCO", active: true },
-  { name: "Costela de porco", price: 5.00, category: "CHURRASCO", active: true },
-  { name: "Frango", price: 5.00, category: "CHURRASCO", active: true },
-  { name: "Língua bovina", price: 5.00, category: "CHURRASCO", active: true },
-  { name: "Moela", price: 5.00, category: "CHURRASCO", active: true },
-  { name: "Ovo com calabresa", price: 5.00, category: "CHURRASCO", active: true },
-  { name: "Pão de alho", price: 5.00, category: "CHURRASCO", active: true },
-  { name: "Queijo", price: 5.00, category: "CHURRASCO", active: true },
-  { name: "Tripa", price: 5.00, category: "CHURRASCO", active: true },
+  { name: "Asa de frango", price: 5.00, category: "CHURRASCO" },
+  { name: "Calabresa", price: 5.00, category: "CHURRASCO" },
+  { name: "Camarão", price: 5.00, category: "CHURRASCO" },
+  { name: "Carne", price: 5.00, category: "CHURRASCO" },
+  { name: "Charque", price: 5.00, category: "CHURRASCO" },
+  { name: "Coração de boi", price: 5.00, category: "CHURRASCO" },
+  { name: "Coração de frango", price: 5.00, category: "CHURRASCO" },
+  { name: "Costela de porco", price: 5.00, category: "CHURRASCO" },
+  { name: "Frango", price: 5.00, category: "CHURRASCO" },
+  { name: "Língua bovina", price: 5.00, category: "CHURRASCO" },
+  { name: "Moela", price: 5.00, category: "CHURRASCO" },
+  { name: "Ovo com calabresa", price: 5.00, category: "CHURRASCO" },
+  { name: "Pão de alho", price: 5.00, category: "CHURRASCO" },
+  { name: "Queijo", price: 5.00, category: "CHURRASCO" },
+  { name: "Tripa", price: 5.00, category: "CHURRASCO" },
   
   // BEBIDAS ALCOÓLICAS
-  { name: "Caranguejo Ouro", price: 5.00, category: "BEBIDAS ALCOÓLICAS", active: true },
-  { name: "Caranguejo Prata", price: 5.00, category: "BEBIDAS ALCOÓLICAS", active: true },
-  { name: "Cerveja Devassa", price: 5.00, category: "BEBIDAS ALCOÓLICAS", active: true },
-  { name: "Cerveja Itaipava", price: 5.00, category: "BEBIDAS ALCOÓLICAS", active: true },
-  { name: "Heineken Long Neck", price: 5.00, category: "BEBIDAS ALCOÓLICAS", active: true },
-  { name: "Pitu Lata", price: 5.00, category: "BEBIDAS ALCOÓLICAS", active: true },
-  { name: "Pitu Limão", price: 5.00, category: "BEBIDAS ALCOÓLICAS", active: true },
-  { name: "Ypióca", price: 5.00, category: "BEBIDAS ALCOÓLICAS", active: true },
-  { name: "Doses (genérico)", price: 5.00, category: "BEBIDAS ALCOÓLICAS", active: true },
+  { name: "Caranguejo Ouro", price: 5.00, category: "BEBIDAS ALCOÓLICAS" },
+  { name: "Caranguejo Prata", price: 5.00, category: "BEBIDAS ALCOÓLICAS" },
+  { name: "Cerveja Devassa", price: 5.00, category: "BEBIDAS ALCOÓLICAS" },
+  { name: "Cerveja Itaipava", price: 5.00, category: "BEBIDAS ALCOÓLICAS" },
+  { name: "Heineken Long Neck", price: 5.00, category: "BEBIDAS ALCOÓLICAS" },
+  { name: "Pitu Lata", price: 5.00, category: "BEBIDAS ALCOÓLICAS" },
+  { name: "Pitu Limão", price: 5.00, category: "BEBIDAS ALCOÓLICAS" },
+  { name: "Ypióca", price: 5.00, category: "BEBIDAS ALCOÓLICAS" },
+  { name: "Doses (genérico)", price: 5.00, category: "BEBIDAS ALCOÓLICAS" },
 
   // BEBIDAS NÃO ALCOÓLICAS
-  { name: "Coca-Cola Lata", price: 5.00, category: "BEBIDAS NÃO ALCOÓLICAS", active: true },
-  { name: "Guaraná 1L", price: 5.00, category: "BEBIDAS NÃO ALCOÓLICAS", active: true },
-  { name: "Guaraná Lata", price: 5.00, category: "BEBIDAS NÃO ALCOÓLICAS", active: true },
-  { name: "Pepsi 1L", price: 5.00, category: "BEBIDAS NÃO ALCOÓLICAS", active: true },
-  { name: "Pepsi Lata", price: 5.00, category: "BEBIDAS NÃO ALCOÓLICAS", active: true },
-  { name: "Sprite Lata", price: 5.00, category: "BEBIDAS NÃO ALCOÓLICAS", active: true },
-  { name: "Suco", price: 5.00, category: "BEBIDAS NÃO ALCOÓLICAS", active: true }
+  { name: "Coca-Cola Lata", price: 5.00, category: "BEBIDAS NÃO ALCOÓLICAS" },
+  { name: "Guaraná 1L", price: 5.00, category: "BEBIDAS NÃO ALCOÓLICAS" },
+  { name: "Guaraná Lata", price: 5.00, category: "BEBIDAS NÃO ALCOÓLICAS" },
+  { name: "Pepsi 1L", price: 5.00, category: "BEBIDAS NÃO ALCOÓLICAS" },
+  { name: "Pepsi Lata", price: 5.00, category: "BEBIDAS NÃO ALCOÓLICAS" },
+  { name: "Sprite Lata", price: 5.00, category: "BEBIDAS NÃO ALCOÓLICAS" },
+  { name: "Suco", price: 5.00, category: "BEBIDAS NÃO ALCOÓLICAS" }
 ];
 
 export default function LandingPage() {
@@ -106,20 +106,6 @@ export default function LandingPage() {
     const trialEnd = new Date();
     trialEnd.setDate(trialEnd.getDate() + 7);
 
-    const initialContactConfig = {
-      phone: form.phone || form.whatsapp || '',
-      instagram: form.instagram || '',
-      locationUrl: form.address || '',
-      address: form.address || ''
-    };
-
-    const initialDeliveryFees = [
-      { name: "Centro", fee: 5.00 },
-      { name: "Bairro Vizinho", fee: 7.00 }
-    ];
-
-    const initialOrderMethods = { pickup: true, delivery: true };
-
     const { data, error: dbError } = await supabase
       .from('tenants')
       .insert([{
@@ -127,18 +113,13 @@ export default function LandingPage() {
         name: form.storeName,
         responsible_name: form.responsibleName,
         phone: form.phone,
-        whatsapp: form.whatsapp,
-        address: form.address,
-        instagram: form.instagram,
+        whatsapp: form.whatsapp || form.phone,
         cpf_cnpj: form.cpfCnpj,
         email: form.email,
         pix_key: form.pixKey,
         status: 'trial',
         trial_ends_at: trialEnd.toISOString(),
         is_active: true,
-        contact_config: initialContactConfig,
-        delivery_fees: initialDeliveryFees,
-        order_methods: initialOrderMethods
       }])
       .select()
       .single();
