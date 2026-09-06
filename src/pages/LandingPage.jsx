@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Flame, ArrowRight, CheckCircle, Store, User, Phone, Mail, CreditCard, Link2, XCircle, Loader2, MapPin, Instagram } from 'lucide-react';
+import { Flame, ArrowRight, CheckCircle, Store, User, Phone, Mail, CreditCard, Link2, XCircle, Loader2, MapPin, Camera } from 'lucide-react';
 
 const DEFAULT_CATEGORIES = ["CHURRASCO", "BEBIDAS ALCOÓLICAS", "BEBIDAS NÃO ALCOÓLICAS"];
 
@@ -278,7 +278,7 @@ export default function LandingPage() {
               <InputField icon={<Phone size={18} />} name="phone" placeholder="Telefone de Contato *" value={form.phone} onChange={handleChange} />
               <InputField icon={<Phone size={18} />} name="whatsapp" placeholder="WhatsApp para Pedidos" value={form.whatsapp} onChange={handleChange} />
               <InputField icon={<MapPin size={18} />} name="address" placeholder="Endereço Completo (Bairro, Cidade)" value={form.address} onChange={handleChange} />
-              <InputField icon={<Instagram size={18} />} name="instagram" placeholder="Instagram (ex: @seu.espetinho)" value={form.instagram} onChange={handleChange} />
+              <InputField icon={<Camera size={18} />} name="instagram" placeholder="Instagram (ex: @seu.espetinho)" value={form.instagram} onChange={handleChange} />
               <InputField icon={<CreditCard size={18} />} name="cpfCnpj" placeholder="CPF ou CNPJ" value={form.cpfCnpj} onChange={handleChange} />
               <InputField icon={<Mail size={18} />} name="email" placeholder="Email *" value={form.email} onChange={handleChange} type="email" />
               <InputField icon={<CreditCard size={18} />} name="pixKey" placeholder="Chave PIX (opcional)" value={form.pixKey} onChange={handleChange} />
