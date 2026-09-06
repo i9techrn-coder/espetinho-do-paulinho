@@ -7,7 +7,7 @@ import {
 import { useStore } from '../context/StoreContext';
 
 export default function WaiterDashboard() {
-  const { orders, addOrder, closeOrder, pixConfig, products, categories, tables, team, currentUser, logout } = useStore();
+  const { tenant, orders, addOrder, closeOrder, pixConfig, products, categories, tables, team, currentUser, logout } = useStore();
   const [selectedTable, setSelectedTable] = useState(null);
   const [checkoutOrder, setCheckoutOrder] = useState(null);
   const [activeTab, setActiveTab] = useState('mesas');
@@ -16,7 +16,7 @@ export default function WaiterDashboard() {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate(`/${tenant?.slug || ''}/login`);
   };
 
   const specialTables = [
