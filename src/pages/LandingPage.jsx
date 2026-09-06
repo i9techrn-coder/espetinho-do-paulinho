@@ -1,7 +1,48 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Flame, ArrowRight, CheckCircle, Store, User, Phone, Mail, CreditCard, Link2, XCircle, Loader2 } from 'lucide-react';
+import { Flame, ArrowRight, CheckCircle, Store, User, Phone, Mail, CreditCard, Link2, XCircle, Loader2, MapPin, Instagram } from 'lucide-react';
+
+const DEFAULT_CATEGORIES = ["CHURRASCO", "BEBIDAS ALCOÓLICAS", "BEBIDAS NÃO ALCOÓLICAS"];
+
+const DEFAULT_PRODUCTS = [
+  // CHURRASCO
+  { name: "Asa de frango", price: 5.00, category: "CHURRASCO", active: true },
+  { name: "Calabresa", price: 5.00, category: "CHURRASCO", active: true },
+  { name: "Camarão", price: 5.00, category: "CHURRASCO", active: true },
+  { name: "Carne", price: 5.00, category: "CHURRASCO", active: true },
+  { name: "Charque", price: 5.00, category: "CHURRASCO", active: true },
+  { name: "Coração de boi", price: 5.00, category: "CHURRASCO", active: true },
+  { name: "Coração de frango", price: 5.00, category: "CHURRASCO", active: true },
+  { name: "Costela de porco", price: 5.00, category: "CHURRASCO", active: true },
+  { name: "Frango", price: 5.00, category: "CHURRASCO", active: true },
+  { name: "Língua bovina", price: 5.00, category: "CHURRASCO", active: true },
+  { name: "Moela", price: 5.00, category: "CHURRASCO", active: true },
+  { name: "Ovo com calabresa", price: 5.00, category: "CHURRASCO", active: true },
+  { name: "Pão de alho", price: 5.00, category: "CHURRASCO", active: true },
+  { name: "Queijo", price: 5.00, category: "CHURRASCO", active: true },
+  { name: "Tripa", price: 5.00, category: "CHURRASCO", active: true },
+  
+  // BEBIDAS ALCOÓLICAS
+  { name: "Caranguejo Ouro", price: 5.00, category: "BEBIDAS ALCOÓLICAS", active: true },
+  { name: "Caranguejo Prata", price: 5.00, category: "BEBIDAS ALCOÓLICAS", active: true },
+  { name: "Cerveja Devassa", price: 5.00, category: "BEBIDAS ALCOÓLICAS", active: true },
+  { name: "Cerveja Itaipava", price: 5.00, category: "BEBIDAS ALCOÓLICAS", active: true },
+  { name: "Heineken Long Neck", price: 5.00, category: "BEBIDAS ALCOÓLICAS", active: true },
+  { name: "Pitu Lata", price: 5.00, category: "BEBIDAS ALCOÓLICAS", active: true },
+  { name: "Pitu Limão", price: 5.00, category: "BEBIDAS ALCOÓLICAS", active: true },
+  { name: "Ypióca", price: 5.00, category: "BEBIDAS ALCOÓLICAS", active: true },
+  { name: "Doses (genérico)", price: 5.00, category: "BEBIDAS ALCOÓLICAS", active: true },
+
+  // BEBIDAS NÃO ALCOÓLICAS
+  { name: "Coca-Cola Lata", price: 5.00, category: "BEBIDAS NÃO ALCOÓLICAS", active: true },
+  { name: "Guaraná 1L", price: 5.00, category: "BEBIDAS NÃO ALCOÓLICAS", active: true },
+  { name: "Guaraná Lata", price: 5.00, category: "BEBIDAS NÃO ALCOÓLICAS", active: true },
+  { name: "Pepsi 1L", price: 5.00, category: "BEBIDAS NÃO ALCOÓLICAS", active: true },
+  { name: "Pepsi Lata", price: 5.00, category: "BEBIDAS NÃO ALCOÓLICAS", active: true },
+  { name: "Sprite Lata", price: 5.00, category: "BEBIDAS NÃO ALCOÓLICAS", active: true },
+  { name: "Suco", price: 5.00, category: "BEBIDAS NÃO ALCOÓLICAS", active: true }
+];
 
 export default function LandingPage() {
   const [showRegister, setShowRegister] = useState(false);
@@ -16,6 +57,8 @@ export default function LandingPage() {
     responsibleName: '',
     phone: '',
     whatsapp: '',
+    address: '',
+    instagram: '',
     cpfCnpj: '',
     email: '',
     pixKey: '',
@@ -63,6 +106,20 @@ export default function LandingPage() {
     const trialEnd = new Date();
     trialEnd.setDate(trialEnd.getDate() + 7);
 
+    const initialContactConfig = {
+      phone: form.phone || form.whatsapp || '',
+      instagram: form.instagram || '',
+      locationUrl: form.address || '',
+      address: form.address || ''
+    };
+
+    const initialDeliveryFees = [
+      { name: "Centro", fee: 5.00 },
+      { name: "Bairro Vizinho", fee: 7.00 }
+    ];
+
+    const initialOrderMethods = { pickup: true, delivery: true };
+
     const { data, error: dbError } = await supabase
       .from('tenants')
       .insert([{
@@ -71,12 +128,17 @@ export default function LandingPage() {
         responsible_name: form.responsibleName,
         phone: form.phone,
         whatsapp: form.whatsapp,
+        address: form.address,
+        instagram: form.instagram,
         cpf_cnpj: form.cpfCnpj,
         email: form.email,
         pix_key: form.pixKey,
         status: 'trial',
         trial_ends_at: trialEnd.toISOString(),
         is_active: true,
+        contact_config: initialContactConfig,
+        delivery_fees: initialDeliveryFees,
+        order_methods: initialOrderMethods
       }])
       .select()
       .single();
@@ -85,6 +147,19 @@ export default function LandingPage() {
       setError('Erro ao criar o estabelecimento: ' + dbError.message);
       setLoading(false);
       return;
+    }
+
+    // Injetar categorias e produtos padrão automaticamente!
+    try {
+      await supabase.from('categories').insert(
+        DEFAULT_CATEGORIES.map(cat => ({ tenant_id: data.id, name: cat }))
+      );
+
+      await supabase.from('products').insert(
+        DEFAULT_PRODUCTS.map(p => ({ ...p, tenant_id: data.id }))
+      );
+    } catch (seedErr) {
+      console.error("Erro ao popular cardápio padrão:", seedErr);
     }
 
     setSuccess(data);
@@ -99,7 +174,7 @@ export default function LandingPage() {
         <div className="max-w-lg w-full bg-white/5 backdrop-blur border border-white/10 rounded-3xl p-10 text-center">
           <CheckCircle className="text-green-400 mx-auto mb-6" size={64} />
           <h1 className="text-3xl font-black text-white mb-2">Cadastro Realizado! 🎉</h1>
-          <p className="text-zinc-400 mb-6">Seu estabelecimento está no ar com 7 dias grátis!</p>
+          <p className="text-zinc-400 mb-6">Seu estabelecimento está no ar com 7 dias grátis e cardápio completo pré-carregado!</p>
           
           <div className="bg-green-500/10 border border-green-500/30 rounded-2xl p-4 mb-6">
             <p className="text-xs text-green-400 font-bold uppercase mb-1">Seu link exclusivo:</p>
@@ -172,7 +247,7 @@ export default function LandingPage() {
 
       {/* Formulário de Cadastro */}
       {showRegister && (
-        <div className="relative z-10 flex items-center justify-center min-h-screen p-6">
+        <div className="relative z-10 flex items-center justify-center min-h-screen p-6 py-12">
           <div className="max-w-lg w-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 md:p-10">
             <button onClick={() => setShowRegister(false)} className="text-zinc-500 hover:text-white text-xs uppercase tracking-widest font-bold mb-6 flex items-center gap-2">
               ← Voltar
@@ -200,8 +275,10 @@ export default function LandingPage() {
               </div>
 
               <InputField icon={<User size={18} />} name="responsibleName" placeholder="Nome do Responsável *" value={form.responsibleName} onChange={handleChange} />
-              <InputField icon={<Phone size={18} />} name="phone" placeholder="Telefone" value={form.phone} onChange={handleChange} />
-              <InputField icon={<Phone size={18} />} name="whatsapp" placeholder="WhatsApp" value={form.whatsapp} onChange={handleChange} />
+              <InputField icon={<Phone size={18} />} name="phone" placeholder="Telefone de Contato *" value={form.phone} onChange={handleChange} />
+              <InputField icon={<Phone size={18} />} name="whatsapp" placeholder="WhatsApp para Pedidos" value={form.whatsapp} onChange={handleChange} />
+              <InputField icon={<MapPin size={18} />} name="address" placeholder="Endereço Completo (Bairro, Cidade)" value={form.address} onChange={handleChange} />
+              <InputField icon={<Instagram size={18} />} name="instagram" placeholder="Instagram (ex: @seu.espetinho)" value={form.instagram} onChange={handleChange} />
               <InputField icon={<CreditCard size={18} />} name="cpfCnpj" placeholder="CPF ou CNPJ" value={form.cpfCnpj} onChange={handleChange} />
               <InputField icon={<Mail size={18} />} name="email" placeholder="Email *" value={form.email} onChange={handleChange} type="email" />
               <InputField icon={<CreditCard size={18} />} name="pixKey" placeholder="Chave PIX (opcional)" value={form.pixKey} onChange={handleChange} />
@@ -215,7 +292,7 @@ export default function LandingPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-red-600 hover:bg-red-700 disabled:bg-zinc-700 text-white font-black py-5 rounded-2xl shadow-2xl shadow-red-600/20 active:scale-95 transition-all text-sm uppercase tracking-widest flex items-center justify-center gap-3"
+                className="w-full bg-red-600 hover:bg-red-700 disabled:bg-zinc-700 text-white font-black py-5 rounded-2xl shadow-2xl shadow-red-600/20 active:scale-95 transition-all text-sm uppercase tracking-widest flex items-center justify-center gap-3 mt-6"
               >
                 {loading ? <Loader2 size={20} className="animate-spin" /> : <>CRIAR MINHA LOJA <ArrowRight size={18} /></>}
               </button>
