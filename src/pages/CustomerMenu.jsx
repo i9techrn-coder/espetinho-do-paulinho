@@ -3,7 +3,7 @@ import { useStore } from '../context/StoreContext';
 import { ShoppingBag, Plus, Minus, X, MessageSquare, MapPin, Clock, User, Phone, Home, CreditCard, Smartphone, Banknote, Copy, Check, Navigation } from 'lucide-react';
 
 export default function CustomerMenu() {
-  const { isStoreOpen, products, categories, addOrder, pixConfig } = useStore();
+  const { isStoreOpen, products, categories, addOrder, pixConfig, loadingData, tenant } = useStore();
   const [activeCategory, setActiveCategory] = useState('');
   const [cart, setCart] = useState([]);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
@@ -101,7 +101,7 @@ export default function CustomerMenu() {
       ? `🚚 *Entrega*%0A📍 Endereço: ${formData.address}%0A🏠 Ref: ${formData.reference}`
       : `🛍️ *Retirar no Local*%0A📍 Local: Rua do Churrasco, 123 - Bairro Central`;
 
-    const message = `*Pedido Online - Espetinho do Paulinho*%0A%0A` +
+    const message = `*Pedido Online - ${tenant?.name || 'Espetinho do Paulinho'}*%0A%0A` +
       cart.map(i => `✅ ${i.qty}x ${i.name} (R$ ${(i.price * i.qty).toFixed(2)})`).join('%0A') +
       `%0A%0A*💰 Total: R$ ${total.toFixed(2)}*%0A%0A*📋 Dados do Cliente:*%0A👤 Nome: ${formData.name}%0A📞 Tel: ${formData.phone}%0A%0A${methodStr}%0A💳 Pagamento: ${paymentStr}%0A📝 Obs: ${formData.obs}`;
     
@@ -125,19 +125,35 @@ export default function CustomerMenu() {
     setCart([]);
     
     // Open WhatsApp
-    window.open(`https://wa.me/5511999999999?text=${message}`, '_blank');
+    const phoneToUse = tenant?.whatsapp ? tenant.whatsapp.replace(/\D/g, '') : '5511999999999';
+    window.open(`https://wa.me/${phoneToUse}?text=${message}`, '_blank');
   };
 
   const canSend = formData.name && formData.phone.length >= 10 && cart.length > 0 && 
     (formData.method === 'Retirar' || (formData.method === 'Entrega' && formData.address));
 
-  if (categories.length === 0) {
+  if (loadingData) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-10 text-center">
         <div className="space-y-4 opacity-30">
-          <ShoppingBag size={64} className="mx-auto" />
+          <ShoppingBag size={64} className="mx-auto animate-bounce" />
           <p className="font-black uppercase tracking-widest">Carregando Cardápio...</p>
         </div>
+      </div>
+    );
+  }
+
+  if (categories.length === 0 && !loadingData) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-10 text-center">
+        <div className="space-y-4 opacity-50 mb-8">
+          <ShoppingBag size={64} className="mx-auto" />
+          <h2 className="text-2xl font-black uppercase tracking-widest text-slate-900">Cardápio Vazio</h2>
+          <p className="text-sm font-bold text-slate-500 max-w-xs mx-auto">Você acabou de criar sua loja! Acesse o painel admin para cadastrar seus produtos.</p>
+        </div>
+        <a href={`/${tenant?.slug}/login`} className="bg-red-600 hover:bg-red-700 text-white font-black py-4 px-8 rounded-full shadow-lg active:scale-95 transition-all uppercase tracking-widest text-sm">
+          Acessar Painel Admin
+        </a>
       </div>
     );
   }
@@ -200,10 +216,10 @@ export default function CustomerMenu() {
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-20 -mt-20 blur-3xl" />
         <div className="max-w-2xl mx-auto flex justify-between items-start relative z-10">
           <div>
-            <h1 className="text-4xl font-black tracking-tighter italic uppercase">Paulinho</h1>
-            <p className="text-[10px] uppercase font-black tracking-widest opacity-60">Espetinhos & Acompanhamentos</p>
+            <h1 className="text-4xl font-black tracking-tighter italic uppercase">{tenant?.name || 'Espeto Fácil'}</h1>
+            <p className="text-[10px] uppercase font-black tracking-widest opacity-60">Cardápio Digital</p>
             <p className="opacity-80 font-bold flex items-center gap-1 mt-3 text-xs bg-black/20 w-fit px-3 py-1 rounded-full border border-white/10">
-              <MapPin size={12} /> Rua do Churrasco, 123
+              <MapPin size={12} /> Aberto para pedidos
             </p>
           </div>
           <div className="bg-white/20 p-4 rounded-3xl backdrop-blur-xl border border-white/20">
@@ -371,7 +387,7 @@ export default function CustomerMenu() {
                 {formData.method === 'Retirar' && (
                   <div className="bg-slate-900 p-6 rounded-[2rem] space-y-1 border border-slate-800 animate-fade-in">
                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Retire em:</p>
-                    <p className="text-white font-black italic">Rua do Churrasco, 123 - Bairro Central</p>
+                    <p className="text-white font-black italic">{tenant?.name || 'Local'}</p>
                   </div>
                 )}
 
