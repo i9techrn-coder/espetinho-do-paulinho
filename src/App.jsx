@@ -7,6 +7,8 @@ import AdminPanel from './pages/AdminPanel';
 import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 import TenantLayout from './components/TenantLayout';
+import LandingPage from './pages/LandingPage';
+import SuperAdmin from './pages/SuperAdmin';
 
 export default function App() {
   return (
@@ -14,12 +16,10 @@ export default function App() {
       <Router>
         <Routes>
           {/* Landing Page do SaaS Espeto Fácil */}
-          <Route path="/" element={
-            <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-900 text-white p-8 text-center">
-              <h1 className="text-4xl font-bold mb-4">Espeto Fácil</h1>
-              <p className="text-zinc-400 max-w-md">O melhor sistema SaaS para gestão da sua espetaria. Acesse o link exclusivo da sua loja.</p>
-            </div>
-          } />
+          <Route path="/" element={<LandingPage />} />
+
+          {/* Super Admin (Paulo) */}
+          <Route path="/superadmin" element={<SuperAdmin />} />
 
           {/* Rotas de Inquilinos (Clientes do SaaS) */}
           <Route path="/:tenantSlug" element={<TenantLayout />}>
