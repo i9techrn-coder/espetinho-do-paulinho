@@ -1,12 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { products as initialProducts, categories as initialCategories } from '../data/products';
+import { supabase } from '../lib/supabase';
 
 const StoreContext = createContext();
 
-const STORAGE_KEY = 'espetinho_store_v6';
+export const StoreProvider = ({ children, tenant }) => {
+  const STORAGE_KEY = `espetinho_store_${tenant.slug}`;
 
-export const StoreProvider = ({ children }) => {
-  // Initialize state from localStorage immediately to prevent "flash" of empty data
   const getSaved = (key, defaultValue) => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
@@ -22,15 +21,19 @@ export const StoreProvider = ({ children }) => {
 
   const [currentUser, setCurrentUser] = useState(() => getSaved('currentUser', null));
   const [isStoreOpenManual, setIsStoreOpenManual] = useState(() => getSaved('isStoreOpenManual', true));
-  const [products, setProducts] = useState(() => getSaved('products', initialProducts));
-  const [categories, setCategories] = useState(() => getSaved('categories', initialCategories));
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [tables, setTables] = useState(() => getSaved('tables', Array.from({ length: 20 }, (_, i) => ({ id: i + 1, name: `Mesa ${i+1}` }))));
-  const [orders, setOrders] = useState(() => getSaved('orders', []));
-  const [pixConfig, setPixConfig] = useState(() => getSaved('pixConfig', { key: '', qrCode: '' }));
+  const [orders, setOrders] = useState([]);
+  
+  // O PIX agora vem do Tenant no Supabase
+  const [pixConfig, setPixConfig] = useState({ key: tenant.pix_key || '', qrCode: '' });
+  
   const [team, setTeam] = useState(() => getSaved('team', [
-    { id: 1, name: 'Paulinho', login: 'admin', password: '123', role: 'Gestor', active: true, assignedTables: 'todas' },
-    { id: 2, name: 'João', login: 'joao', password: '123', role: 'Garçom', active: true, assignedTables: 'todas' },
+    { id: 1, name: 'Admin ' + tenant.name, login: 'admin', password: '123', role: 'Gestor', active: true, assignedTables: 'todas' },
+    { id: 2, name: 'Garçom', login: 'garcom', password: '123', role: 'Garçom', active: true, assignedTables: 'todas' },
   ]));
+  
   const [schedule, setSchedule] = useState(() => getSaved('schedule', {
     'Segunda': { open: '18:00', close: '00:00', active: true },
     'Terça': { open: '18:00', close: '00:00', active: true },
@@ -41,21 +44,32 @@ export const StoreProvider = ({ children }) => {
     'Domingo': { open: '18:00', close: '23:00', active: true },
   }));
 
-  // Auto-save to localStorage whenever state changes
+  // Buscar dados do Supabase ao carregar
   useEffect(() => {
-    const dataToSave = { 
-      currentUser,
-      isStoreOpenManual, 
-      orders, 
-      team, 
-      pixConfig, 
-      categories, 
-      products, 
-      schedule, 
-      tables 
-    };
+    async function fetchData() {
+      // Busca categorias
+      const { data: catData } = await supabase.from('categories').select('*').eq('tenant_id', tenant.id);
+      if (catData) setCategories(catData.map(c => c.name));
+
+      // Busca produtos
+      const { data: prodData } = await supabase.from('products').select('*').eq('tenant_id', tenant.id);
+      if (prodData) setProducts(prodData);
+
+      // Busca pedidos (apenas os do dia atual em um app real, mas aqui pegamos os não finalizados)
+      const { data: orderData } = await supabase.from('orders').select('*').eq('tenant_id', tenant.id);
+      if (orderData) setOrders(orderData);
+    }
+    
+    fetchData();
+
+    // Configurar WebSockets (Realtime) para os pedidos no futuro!
+  }, [tenant.id]);
+
+  // Auto-save do que ainda é local
+  useEffect(() => {
+    const dataToSave = { currentUser, isStoreOpenManual, team, schedule, tables };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
-  }, [currentUser, isStoreOpenManual, orders, team, pixConfig, categories, products, schedule, tables]);
+  }, [currentUser, isStoreOpenManual, team, schedule, tables]);
 
   const login = (loginStr, password) => {
     const user = team.find(u => u.login === loginStr && u.password === password && u.active);
@@ -86,55 +100,55 @@ export const StoreProvider = ({ children }) => {
   const isStoreOpen = isStoreOpenManual && isStoreOpenAuto();
   const toggleStore = () => setIsStoreOpenManual(!isStoreOpenManual);
 
-  const addOrder = (orderData) => {
-    setOrders(prev => {
-      // For Mesa orders, we might want to merge if there's an open order.
-      // For Online/Balcão, every order should be a new entry.
-      const shouldMerge = orderData.origin === 'Mesa';
-      const existingIdx = shouldMerge 
-        ? prev.findIndex(o => o.tableId === orderData.tableId && o.status === 'aberto' && o.origin === 'Mesa')
-        : -1;
-      
-      const newOrderInfo = {
-        ...orderData,
-        origin: orderData.origin || 'Mesa',
-        customerData: orderData.customerData || null,
-        waiterId: orderData.waiterId || currentUser?.id,
-        waiterName: orderData.waiterName || currentUser?.name || 'Sistema',
-        timestamp: new Date().toISOString()
-      };
+  const addOrder = async (orderData) => {
+    const shouldMerge = orderData.origin === 'Mesa';
+    const existingIdx = shouldMerge 
+      ? orders.findIndex(o => o.tableId === orderData.tableId && o.status === 'aberto' && o.origin === 'Mesa')
+      : -1;
+    
+    const newOrderInfo = {
+      tenant_id: tenant.id,
+      origin: orderData.origin || 'Mesa',
+      customer_data: orderData.customerData || null,
+      status: orderData.status || 'aberto',
+      items: orderData.items,
+      total: orderData.total
+    };
 
-      if (existingIdx !== -1) {
+    if (existingIdx !== -1) {
+      // Atualizar pedido existente no Supabase (merge de itens)
+      const existingOrder = orders[existingIdx];
+      const mergedItems = [...existingOrder.items, ...orderData.items];
+      const newTotal = existingOrder.total + orderData.total;
+      
+      await supabase.from('orders').update({
+        items: mergedItems,
+        total: newTotal
+      }).eq('id', existingOrder.id);
+      
+      // Atualiza estado local
+      setOrders(prev => {
         const updated = [...prev];
-        updated[existingIdx] = {
-          ...updated[existingIdx],
-          ...newOrderInfo,
-          items: [...updated[existingIdx].items, ...orderData.items], // Append items for Mesa
-          total: updated[existingIdx].total + orderData.total,
-          id: updated[existingIdx].id, // keep original id
-          status: 'aberto'
-        };
+        updated[existingIdx] = { ...existingOrder, items: mergedItems, total: newTotal };
         return updated;
-      } else {
-        return [...prev, { 
-          ...newOrderInfo, 
-          id: Date.now(), 
-          status: orderData.status || 'aberto'
-        }];
+      });
+    } else {
+      // Criar novo pedido no Supabase
+      const { data } = await supabase.from('orders').insert([newOrderInfo]).select().single();
+      if (data) {
+        setOrders(prev => [...prev, data]);
       }
-    });
+    }
   };
 
-  const closeOrder = (orderId, paymentDetails) => {
-    setOrders(prev => prev.map(o => 
-      o.id === orderId 
-        ? { ...o, status: 'finalizado', payment: paymentDetails } 
-        : o
-    ));
+  const closeOrder = async (orderId, paymentDetails) => {
+    await supabase.from('orders').update({ status: 'finalizado' }).eq('id', orderId);
+    setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'finalizado' } : o));
   };
 
   return (
     <StoreContext.Provider value={{ 
+      tenant,
       isStoreOpen, isStoreOpenManual, toggleStore, 
       orders, setOrders, addOrder, closeOrder,
       team, setTeam,
